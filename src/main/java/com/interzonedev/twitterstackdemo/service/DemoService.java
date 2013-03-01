@@ -1,8 +1,7 @@
 package com.interzonedev.twitterstackdemo.service;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,27 +10,27 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
+import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.LoggerFactory;
 
-import scala.actors.threadpool.Arrays;
-
 import ch.qos.logback.classic.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ServerBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 
 /**
- * Simple implementation of {@link Service<HttpRequest, HttpResponse>} that echos the request parameters as JSON.
+ * Simple implementation of {@link Service<HttpRequest, HttpResponse>} that echos the request parameters back to the
+ * response as JSON.
  * 
  * @author mmarkarian
  */
@@ -45,6 +44,8 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 	private String serviceHostName = "localhost";
 
 	private int servicePort = 10000;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	/**
 	 * Starts the service.
@@ -62,18 +63,38 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 	}
 
 	/**
-	 * Services requests.
+	 * Services requests. Returns a response with a JSON body that echos any parameters in the request.
+	 * 
+	 * @param request
+	 *            The incoming {@link HttpRequest}.
+	 * 
+	 * @return Returns a {@link Future<HttpResponse>} that contains a JSON body that echos any parameters in the
+	 *         request.
 	 */
 	@Override
 	public Future<HttpResponse> apply(HttpRequest request) {
 
 		log.debug("apply: Received request - " + request);
 
-		Map<String, List<String>> parameters = getParametersMap(request);
+		String responseContent = null;
+		HttpResponseStatus status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
 
-		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+		try {
+			Map<String, List<String>> parameters = getParametersMap(request);
+			responseContent = objectMapper.writeValueAsString(parameters);
+			status = HttpResponseStatus.OK;
+		} catch (Throwable t) {
+			if (StringUtils.isNotBlank(t.getMessage())) {
+				responseContent = t.getMessage();
+			}
+			log.error("apply: Error generating response", t);
+		}
 
-		response.setContent(ChannelBuffers.wrappedBuffer("foo".getBytes()));
+		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
+
+		if (null != responseContent) {
+			response.setContent(ChannelBuffers.wrappedBuffer(responseContent.getBytes()));
+		}
 
 		Future<HttpResponse> future = Future.value(response);
 
@@ -83,36 +104,45 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 
 	}
 
+	/**
+	 * Transforms the parameters in either body or the query string of the specified {@link HttpRequest} into a map.
+	 * 
+	 * @param request
+	 *            The current {@link HttpRequest}.
+	 * 
+	 * @return Returns a map containing the parameters in either body or the query string of the specified
+	 *         {@link HttpRequest}.
+	 */
 	private Map<String, List<String>> getParametersMap(HttpRequest request) {
 
 		Map<String, List<String>> parametersMap = new HashMap<String, List<String>>();
 
-		HttpMethod requestMethod = request.getMethod();
+		StringBuilder parameters = new StringBuilder();
 
-		if (HttpMethod.POST.equals(requestMethod) || HttpMethod.PUT.equals(requestMethod)) {
-			OutputStream out = null;
-			try {
-				request.getContent().readBytes(out, 0);
-			} catch (IOException ioe) {
-				log.error("Error reading request body", ioe);
+		long contentLength = HttpHeaders.getContentLength(request);
+
+		if (contentLength > 0) {
+			parameters.append(request.getContent().toString(Charset.defaultCharset()));
+		}
+
+		String requestUri = request.getUri();
+
+		if (requestUri.contains("?")) {
+			if (parameters.length() > 0) {
+				parameters.append("&");
 			}
-		} else {
-			String requestUri = request.getUri();
+			parameters.append(requestUri.substring(requestUri.indexOf("?") + 1));
+		}
 
-			if (!requestUri.contains("?")) {
-				return parametersMap;
-			}
+		if (parameters.length() > 0) {
+			String[] parameterParts = parameters.toString().split("&");
 
-			String queryString = requestUri.substring(requestUri.indexOf("?") + 1);
-
-			String[] queryStringParts = queryString.split("&");
-
-			for (String queryStringPart : queryStringParts) {
-				String[] param = queryStringPart.split("=");
-				String name = param[0];
+			for (String parameterPart : parameterParts) {
+				String[] parameter = parameterPart.split("=");
+				String name = parameter[0];
 				String value = "";
-				if (param.length > 1) {
-					value = param[1];
+				if (parameter.length > 1) {
+					value = parameter[1];
 				}
 
 				List<String> mappedValues = parametersMap.get(name);
@@ -122,24 +152,11 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 				}
 				mappedValues.add(value);
 			}
-
 		}
 
 		return parametersMap;
 
 	}
-
-	/*
-	 * private Map<String, List<String>> getParametersMap(HttpServletRequest request) { Map<String, List<String>>
-	 * parametersMap = new HashMap<String, List<String>>();
-	 * 
-	 * @SuppressWarnings("unchecked") Map<String, String[]> rawParameterMap = request.getParameterMap(); for (String
-	 * parameterName : rawParameterMap.keySet()) { String[] rawParameterValues = rawParameterMap.get(parameterName);
-	 * List<String> parameterValues = Arrays.asList(rawParameterValues); parametersMap.put(parameterName,
-	 * parameterValues); }
-	 * 
-	 * return parametersMap; }
-	 */
 
 	public static void main(String[] args) {
 
