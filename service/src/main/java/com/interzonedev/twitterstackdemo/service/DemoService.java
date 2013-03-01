@@ -85,10 +85,12 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 
 		try {
 			Map<String, List<String>> parameters = getParametersMap(request);
+			Map<String, List<String>> headers = getHeadersMap(request);
 
 			Map<String, Object> responseMap = new HashMap<String, Object>();
 			responseMap.put("currentTimeMillis", System.currentTimeMillis());
 			responseMap.put("parameters", parameters);
+			responseMap.put("headers", headers);
 
 			responseContent = objectMapper.writeValueAsString(responseMap);
 			status = HttpResponseStatus.OK;
@@ -164,6 +166,28 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 		}
 
 		return parametersMap;
+
+	}
+
+	private Map<String, List<String>> getHeadersMap(HttpRequest request) {
+
+		Map<String, List<String>> headersMap = new HashMap<String, List<String>>();
+
+		List<Map.Entry<String, String>> headers = request.getHeaders();
+
+		for (Map.Entry<String, String> header : headers) {
+			String headerName = header.getKey();
+			String headerValue = header.getValue();
+
+			List<String> mappedValues = headersMap.get(headerName);
+			if (null == mappedValues) {
+				mappedValues = new ArrayList<String>();
+				headersMap.put(headerName, mappedValues);
+			}
+			mappedValues.add(headerValue);
+		}
+
+		return headersMap;
 
 	}
 

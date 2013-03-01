@@ -1,63 +1,67 @@
 package com.interzonedev.twitterstackdemo.client;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.LoggerFactory;
 
+import scala.actors.threadpool.Arrays;
 import ch.qos.logback.classic.Logger;
 
-import com.twitter.finagle.Service;
-import com.twitter.finagle.builder.ClientBuilder;
-import com.twitter.finagle.http.Http;
-import com.twitter.util.FutureEventListener;
+import com.interzonedev.twitterstackdemo.client.http.HttpClient;
 
 @Named("demoClient")
 public class DemoClientImpl implements DemoClient {
 
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
-	private Service<HttpRequest, HttpResponse> client;
+	@Inject
+	@Named("httpClient")
+	private HttpClient httpClient;
 
-	@PostConstruct
-	public void init() {
-
-		client = ClientBuilder.safeBuild(ClientBuilder.get().codec(Http.get()).hosts("localhost:10000")
-				.hostConnectionLimit(1));
-
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
-	public String makeRequest(String message) {
+	public String doRequest(String message) {
 
-		HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+		log.debug("makeRequest: Sending message = " + message);
 
-		FutureEventListener<HttpResponse> futureEventListener = new FutureEventListener<HttpResponse>() {
+		String url = "/";
+		HttpMethod method = HttpMethod.POST;
 
-			private String responseContent;
+		Map<String, List<String>> headers = new HashMap<String, List<String>>();
+		headers.put("h1", Arrays.asList(new String[] { "v1" }));
 
-			@Override
-			public void onFailure(Throwable t) {
-				log.error("Error getting response", t);
-			}
+		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+		parameters.put("message", Arrays.asList(new String[] { message }));
 
-			@Override
-			public void onSuccess(HttpResponse response) {
-				responseContent = response.getContent().toString(Charset.defaultCharset());
-			}
+		HttpRequest request = httpClient.buildRequest(url, method, headers, parameters);
+		long timeoutNanos = TimeUnit.SECONDS.toNanos(1);
 
-		};
+		String responseContent = null;
+		try {
+			Future<HttpResponse> responseFuture = httpClient.doRequest(request, timeoutNanos);
 
-		client.apply(request).addEventListener(futureEventListener);
+			HttpResponse response = responseFuture.get();
+			responseContent = response.getContent().toString(Charset.defaultCharset());
 
-		return null;
+			log.debug("makeRequest: Received response - status = " + response.getStatus().getCode() + " - content = "
+					+ responseContent);
+		} catch (Throwable t) {
+			log.error("Error getting response", t);
+		}
+
+		return responseContent;
+
 	}
 
 }
