@@ -19,6 +19,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import ch.qos.logback.classic.Logger;
 
@@ -39,11 +40,14 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
-	private String serviceName = "HttpServer";
+	@Value("#{serviceProperties.serverName}")
+	private String serviceName;
 
-	private String serviceHostName = "localhost";
+	@Value("#{serviceProperties.hostName}")
+	private String serviceHostName;
 
-	private int servicePort = 10000;
+	@Value("#{serviceProperties.port}")
+	private int servicePort;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -81,7 +85,12 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 
 		try {
 			Map<String, List<String>> parameters = getParametersMap(request);
-			responseContent = objectMapper.writeValueAsString(parameters);
+
+			Map<String, Object> responseMap = new HashMap<String, Object>();
+			responseMap.put("currentTimeMillis", System.currentTimeMillis());
+			responseMap.put("parameters", parameters);
+
+			responseContent = objectMapper.writeValueAsString(responseMap);
 			status = HttpResponseStatus.OK;
 		} catch (Throwable t) {
 			if (StringUtils.isNotBlank(t.getMessage())) {
@@ -155,12 +164,6 @@ public class DemoService extends Service<HttpRequest, HttpResponse> {
 		}
 
 		return parametersMap;
-
-	}
-
-	public static void main(String[] args) {
-
-		(new DemoService()).init();
 
 	}
 

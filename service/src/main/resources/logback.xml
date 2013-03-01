@@ -3,8 +3,7 @@
 <configuration>
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
-			</pattern>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
 		</encoder>
 	</appender>
 
@@ -12,7 +11,7 @@
 	<logger name="org.springframework.context" level="WARN" />
 	<logger name="org.springframework.beans.factory.annotation" level="WARN" />
 
-	<logger name="com.interzonedev.twitterstackdemo" level="DEBUG" />
+	<logger name="com.rocketlawyer.twitterstackdemo" level="DEBUG" />
 
 	<root level="DEBUG">
 		<appender-ref ref="STDOUT" />
