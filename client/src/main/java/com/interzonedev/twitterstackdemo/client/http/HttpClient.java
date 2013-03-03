@@ -8,6 +8,7 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
+@Deprecated
 public interface HttpClient {
 
 	public Future<HttpResponse> doRequest(HttpRequest request, long timeoutNanos) throws Exception;

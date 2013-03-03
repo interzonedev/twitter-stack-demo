@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
 import org.jboss.netty.handler.codec.http.HttpMessage;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -22,6 +26,74 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
  * @author mmarkarian
  */
 public class HttpUtils {
+
+	private static final HttpVersion HTTP_VERSION = HttpVersion.HTTP_1_1;
+
+	public static HttpRequest buildRequest(String url, HttpMethod method, Map<String, List<String>> headers,
+			Map<String, List<String>> parameters) {
+
+		StringBuilder urlWithParams = new StringBuilder(url);
+
+		String requestContent = getRequestContentFromParameters(parameters);
+
+		ChannelBuffer requestContentBuffer = null;
+
+		if (StringUtils.isNotBlank(requestContent)) {
+			if (HttpMethod.POST.equals(method) || HttpMethod.PUT.equals(method)) {
+				requestContentBuffer = ChannelBuffers.wrappedBuffer(requestContent.getBytes());
+			} else {
+
+				if (urlWithParams.indexOf("?") > 0) {
+					urlWithParams.append("&");
+				} else {
+					urlWithParams.append("?");
+				}
+				urlWithParams.append(requestContent);
+			}
+		}
+
+		HttpRequest request = new DefaultHttpRequest(HTTP_VERSION, method, urlWithParams.toString());
+
+		if (null != requestContentBuffer) {
+			request.setContent(requestContentBuffer);
+			request.addHeader(Names.CONTENT_LENGTH, requestContent.length());
+		}
+
+		if (null != headers) {
+			for (String headerName : headers.keySet()) {
+				List<String> headerValues = headers.get(headerName);
+				for (String headerValue : headerValues) {
+					request.addHeader(headerName, headerValue);
+				}
+			}
+		}
+
+		return request;
+
+	}
+
+	public static String getRequestContentFromParameters(Map<String, List<String>> parameters) {
+
+		if (null == parameters) {
+			return null;
+		}
+
+		StringBuilder content = new StringBuilder();
+
+		for (String name : parameters.keySet()) {
+			List<String> values = parameters.get(name);
+			for (String value : values) {
+				content.append(name).append("=").append(value).append("&");
+			}
+		}
+
+		if (content.length() > 0) {
+			content.delete(content.length() - 1, content.length());
+		}
+
+		return content.toString();
+
+	}
 
 	/**
 	 * Transforms the parameters in either body or the query string of the specified {@link HttpRequest} into a map.
@@ -139,13 +211,21 @@ public class HttpUtils {
 	public static HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers,
 			String content) {
 
-		HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, status);
+		HttpResponse response = new DefaultHttpResponse(HTTP_VERSION, status);
 
 		addHeadersToMessage(response, headers);
 
 		setContentInResponse(response, content);
 
 		return response;
+
+	}
+
+	public static String getResponseContent(HttpResponse response) {
+
+		String responseContent = response.getContent().toString(Charset.defaultCharset());
+
+		return responseContent;
 
 	}
 

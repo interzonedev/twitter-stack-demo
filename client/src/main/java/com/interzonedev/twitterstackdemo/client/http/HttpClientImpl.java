@@ -31,6 +31,7 @@ import com.twitter.util.Duration;
 import com.twitter.util.Throw;
 import com.twitter.util.Try;
 
+@Deprecated
 @Named("httpClient")
 public class HttpClientImpl implements HttpClient {
 

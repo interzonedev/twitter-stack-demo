@@ -2,8 +2,6 @@ package com.interzonedev.twitterstackdemo.base;
 
 import java.net.InetSocketAddress;
 
-import javax.inject.Named;
-
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -17,12 +15,10 @@ import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 
 /**
- * Simple implementation of {@link Service<HttpRequest, HttpResponse>} that echos the request parameters back to the
- * response as JSON.
+ * Abstract super class for all service implementations using HTTP as the transport mechanism.
  * 
  * @author mmarkarian
  */
-@Named("demoService")
 public abstract class AbstractHttpServiceBase extends Service<HttpRequest, HttpResponse> {
 
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());

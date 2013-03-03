@@ -13,17 +13,16 @@ public class FunctionalTestDemoClient extends AbstractTest {
 	private DemoClient demoClient;
 
 	@Test
-	public void testMakeRequest() throws InterruptedException {
+	public void testMakeRequest() throws Exception {
 
 		log.debug("testMakeRequest: Start");
 
-		String responseContent = demoClient.doRequest("foo");
+		String responseContent = demoClient.doSomething("Foo", 1000);
 
 		log.debug("testMakeRequest: responseContent = " + responseContent);
 
 		Assert.assertTrue(responseContent.contains("currentTimeMillis"));
-		Assert.assertTrue(responseContent.contains("parameters"));
-		Assert.assertTrue(responseContent.contains("headers"));
+		Assert.assertTrue(responseContent.contains("message"));
 
 	}
 

@@ -40,6 +40,9 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 
 	@PostConstruct
 	public void init() {
+
+		log.info("Launching service");
+
 		launch();
 	}
 
