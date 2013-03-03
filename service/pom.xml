@@ -20,6 +20,11 @@
 			<artifactId>twitter-stack-demo-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.interzonedev</groupId>
+			<artifactId>twitter-stack-demo-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

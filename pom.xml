@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>base</module>
 		<module>common</module>
 		<module>service</module>
 		<module>client</module>
