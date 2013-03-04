@@ -9,8 +9,7 @@ import ch.qos.logback.classic.Logger;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ClientBuilder;
 import com.twitter.finagle.http.Http;
-import com.twitter.util.Duration;
-import com.twitter.util.Try;
+import com.twitter.util.Future;
 
 /**
  * Abstract super class for all client implementations using HTTP as the transport mechanism.
@@ -21,10 +20,10 @@ public abstract class AbstractHttpClientBase {
 
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
-	private Service<HttpRequest, HttpResponse> client;
+	private Service<HttpRequest, HttpResponse> httpClient;
 
 	/**
-	 * Starts the service.
+	 * Gets the necessary parameters from the implementing subclass and creates the client.
 	 */
 	protected void create() {
 
@@ -37,26 +36,50 @@ public abstract class AbstractHttpClientBase {
 		log.info("create: Creating client for http://" + serviceHostName + ":" + servicePort
 				+ " with connection limit " + hostConnectionLimit);
 
-		client = ClientBuilder.safeBuild(ClientBuilder.get().codec(Http.get())
+		httpClient = ClientBuilder.safeBuild(ClientBuilder.get().codec(Http.get())
 				.hosts(serviceHostName + ":" + servicePort).hostConnectionLimit(hostConnectionLimit));
 
 	}
 
+	/**
+	 * Allows the implementing subclass to specify the host name of the service to which this client connects.
+	 * 
+	 * @return Returns the host name of the service to which this client connects.
+	 */
 	protected abstract String getServiceHostName();
 
+	/**
+	 * Allows the implementing subclass to specify the port of the service to which this client connects.
+	 * 
+	 * @return Returns the port of the service to which this client connects.
+	 */
 	protected abstract int getServicePort();
 
+	/**
+	 * Allows the implementing subclass to specify the host connection limit to the service to which this client
+	 * connects.
+	 * 
+	 * @return Returns the host connection limit of this client.
+	 */
 	protected abstract int getHostConnectionLimit();
 
-	protected Try<HttpResponse> call(HttpRequest request, long timeoutNanos) {
+	/**
+	 * Meant to be called by the implementing subclass to perform an asynchronous HTTP request.
+	 * 
+	 * @param request
+	 *            The {@link HttpRequest} to be sent.
+	 * 
+	 * @return Returns a {@link Future<HttpResponse>} that allows for asynchronously getting the response.
+	 */
+	protected Future<HttpResponse> call(HttpRequest request) {
 
 		log.debug("call: Sending request - " + request);
 
-		Try<HttpResponse> responseTry = client.apply(request).get(new Duration(timeoutNanos));
+		Future<HttpResponse> responseFuture = httpClient.apply(request);
 
 		log.debug("call: Sent request");
 
-		return responseTry;
+		return responseFuture;
 
 	}
 

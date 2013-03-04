@@ -17,7 +17,7 @@ public class FunctionalTestDemoClient extends AbstractTest {
 
 		log.debug("testMakeRequest: Start");
 
-		String responseContent = demoClient.doSomething("Foo", 1000);
+		String responseContent = demoClient.doSomething("Foo", 5000);
 
 		log.debug("testMakeRequest: responseContent = " + responseContent);
 

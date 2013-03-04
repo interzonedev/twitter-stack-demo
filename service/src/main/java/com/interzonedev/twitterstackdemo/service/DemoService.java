@@ -24,7 +24,9 @@ public class DemoService implements DemoApi {
 
 		log.debug("doSomething: Start");
 
+		log.debug("doSomething: Sleep for " + delayMillis + " ms");
 		Thread.sleep(delayMillis);
+		log.debug("doSomething: Done sleeping");
 
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		responseMap.put("currentTimeMillis", System.currentTimeMillis());

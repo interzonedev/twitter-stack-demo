@@ -3,12 +3,12 @@ package com.interzonedev.twitterstackdemo.client;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +17,8 @@ import ch.qos.logback.classic.Logger;
 
 import com.interzonedev.twitterstackdemo.base.HttpUtils;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
+import com.twitter.util.Duration;
+import com.twitter.util.Future;
 import com.twitter.util.Throw;
 import com.twitter.util.Try;
 
@@ -42,10 +44,17 @@ public class DemoClient implements DemoApi {
 		parameters.put("message", Arrays.asList(new String[] { message }));
 		parameters.put("delayMillis", Arrays.asList(new String[] { Long.toString(delayMillis) }));
 
-		HttpRequest request = HttpUtils.buildRequest(url, method, null, parameters);
+		log.debug("doSomething: Sending request");
+		
+		Future<HttpResponse> responseFuture = demoClientBase.call(url, method, null, parameters);
 
-		Try<HttpResponse> responseTry = demoClientBase.call(request);
+		log.debug("doSomething: Sent request");
+		
+		long timeoutMillis = 1000L;
+		Try<HttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS.toNanos(timeoutMillis)));
 
+		log.debug("doSomething: Got response");
+		
 		String responseContent = null;
 
 		if (responseTry.isReturn()) {
