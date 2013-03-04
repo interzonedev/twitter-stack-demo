@@ -44,6 +44,7 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 		log.info("Launching service");
 
 		launch();
+
 	}
 
 	@Override
@@ -72,9 +73,21 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 		try {
 			// Get method arguments from request parameters.
 			Map<String, List<String>> parameters = HttpUtils.getParametersFromRequest(request);
-			String message = parameters.get("message").get(0);
-			String delayMillsValue = parameters.get("delayMillis").get(0);
-			long delayMillis = Long.parseLong(delayMillsValue);
+
+			String message = "";
+			if (null != parameters.get("message")) {
+				message = parameters.get("message").get(0);
+			}
+
+			long delayMillis = 0L;
+			if (null != parameters.get("delayMillis")) {
+				String delayMillsValue = parameters.get("delayMillis").get(0);
+				try {
+					delayMillis = Long.parseLong(delayMillsValue);
+				} catch (NumberFormatException nfe) {
+					log.warn("call: Error converting " + delayMillsValue + " to a long");
+				}
+			}
 
 			content = demoService.doSomething(message, delayMillis);
 			status = HttpResponseStatus.OK;
