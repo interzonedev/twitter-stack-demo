@@ -1,4 +1,4 @@
-package com.interzonedev.twitterstackdemo.base;
+package com.interzonedev.twitterstackdemo.base.http;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;

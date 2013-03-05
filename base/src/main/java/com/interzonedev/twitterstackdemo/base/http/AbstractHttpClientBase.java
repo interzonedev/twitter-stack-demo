@@ -1,4 +1,4 @@
-package com.interzonedev.twitterstackdemo.base;
+package com.interzonedev.twitterstackdemo.base.http;
 
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;

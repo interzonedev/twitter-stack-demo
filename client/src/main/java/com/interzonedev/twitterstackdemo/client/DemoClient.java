@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import scala.actors.threadpool.Arrays;
 import ch.qos.logback.classic.Logger;
 
-import com.interzonedev.twitterstackdemo.base.HttpUtils;
+import com.interzonedev.twitterstackdemo.base.http.HttpUtils;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 import com.twitter.util.Duration;
 import com.twitter.util.Future;
@@ -45,16 +45,16 @@ public class DemoClient implements DemoApi {
 		parameters.put("delayMillis", Arrays.asList(new String[] { Long.toString(delayMillis) }));
 
 		log.debug("doSomething: Sending request");
-		
+
 		Future<HttpResponse> responseFuture = demoClientBase.call(url, method, null, parameters);
 
 		log.debug("doSomething: Sent request");
-		
+
 		long timeoutMillis = 1000L;
 		Try<HttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS.toNanos(timeoutMillis)));
 
 		log.debug("doSomething: Got response");
-		
+
 		String responseContent = null;
 
 		if (responseTry.isReturn()) {

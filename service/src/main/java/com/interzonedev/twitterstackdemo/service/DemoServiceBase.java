@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import ch.qos.logback.classic.Logger;
 
-import com.interzonedev.twitterstackdemo.base.AbstractHttpServiceBase;
-import com.interzonedev.twitterstackdemo.base.HttpUtils;
+import com.interzonedev.twitterstackdemo.base.http.AbstractHttpServiceBase;
+import com.interzonedev.twitterstackdemo.base.http.HttpUtils;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 
 @Named("demoServiceBase")
