@@ -8,16 +8,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import ch.qos.logback.classic.Logger;
 
 import com.interzonedev.twitterstackdemo.base.http.AbstractHttpServiceBase;
-import com.interzonedev.twitterstackdemo.base.http.HttpUtils;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 
 @Named("demoServiceBase")
@@ -63,16 +61,16 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 	}
 
 	@Override
-	protected HttpResponse call(HttpRequest request) {
+	protected BaseHttpResponse call(BaseHttpRequest request) {
 
 		log.debug("call: Received request - " + request);
 
 		String content = null;
-		HttpResponseStatus status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+		int status = 500;
 
 		try {
-			// Get method arguments from request parameters.
-			Map<String, List<String>> parameters = HttpUtils.getParametersFromRequest(request);
+
+			Map<String, List<String>> parameters = request.getParameters();
 
 			String message = "";
 			if (null != parameters.get("message")) {
@@ -90,21 +88,21 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 			}
 
 			content = demoService.doSomething(message, delayMillis);
-			status = HttpResponseStatus.OK;
+			status = 200;
+
 		} catch (Throwable t) {
+
 			log.error("call: Error executing service", t);
 			content = "Error executing service";
 			if (StringUtils.isNotBlank(t.getMessage())) {
 				content += ":" + t.getMessage();
 			}
+
 		}
 
-		HttpResponse response = HttpUtils.buildResponse(status, null, content);
-
-		log.debug("call: Returning response - " + response);
+		BaseHttpResponse response = new BaseHttpResponse(request, null, content, status);
 
 		return response;
-
 	}
 
 }

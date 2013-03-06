@@ -5,9 +5,6 @@ import java.net.InetSocketAddress;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
 
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ServerBuilder;
@@ -19,9 +16,7 @@ import com.twitter.util.Future;
  * 
  * @author mmarkarian
  */
-public abstract class AbstractHttpServiceBase {
-
-	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
+public abstract class AbstractHttpServiceBase extends AbstractHttpBase {
 
 	/**
 	 * Anonymous implementation of the abstract {@link Service} class to receive, delegate and return HTTP requests.
@@ -45,10 +40,14 @@ public abstract class AbstractHttpServiceBase {
 			HttpResponse response = null;
 
 			try {
-				response = call(request);
+				BaseHttpRequest baseRequest = getBaseHttpRequest(request);
+
+				BaseHttpResponse baseResponse = call(baseRequest);
+
+				response = getHttpResponse(baseResponse);
 			} catch (Throwable t) {
 				log.error("apply: Error calling service", t);
-				HttpUtils.buildResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, null, t.getMessage());
+				response = buildResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, null, t.getMessage());
 			}
 
 			Future<HttpResponse> future = Future.value(response);
@@ -106,10 +105,10 @@ public abstract class AbstractHttpServiceBase {
 	 * Delegates the work to respond to thr request to the implementing subclass.
 	 * 
 	 * @param request
-	 *            The current {@link HttpRequest}.
+	 *            The current {@link BaseHttpRequest}.
 	 * 
-	 * @return Returns the {@link HttpResponse} created by the implementing subclass.
+	 * @return Returns the {@link BaseHttpResponse} created by the implementing subclass.
 	 */
-	protected abstract HttpResponse call(HttpRequest request);
+	protected abstract BaseHttpResponse call(BaseHttpRequest request);
 
 }

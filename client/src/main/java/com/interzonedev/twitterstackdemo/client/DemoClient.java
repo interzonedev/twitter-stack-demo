@@ -38,7 +38,7 @@ public class DemoClient implements DemoApi {
 		log.debug("doSomething: message = " + message + " - delayMillis = " + delayMillis);
 
 		String url = "/";
-		HttpMethod method = HttpMethod.POST;
+		HttpMethod method = HttpMethod.GET;
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		parameters.put("message", Arrays.asList(new String[] { message }));

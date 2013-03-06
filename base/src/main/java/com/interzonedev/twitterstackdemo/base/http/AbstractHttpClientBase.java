@@ -2,9 +2,6 @@ package com.interzonedev.twitterstackdemo.base.http;
 
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
 
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ClientBuilder;
@@ -16,9 +13,7 @@ import com.twitter.util.Future;
  * 
  * @author mmarkarian
  */
-public abstract class AbstractHttpClientBase {
-
-	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
+public abstract class AbstractHttpClientBase extends AbstractHttpBase {
 
 	private Service<HttpRequest, HttpResponse> httpClient;
 
