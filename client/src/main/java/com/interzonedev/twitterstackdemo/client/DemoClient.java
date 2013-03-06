@@ -8,14 +8,13 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.slf4j.LoggerFactory;
 
 import scala.actors.threadpool.Arrays;
 import ch.qos.logback.classic.Logger;
 
-import com.interzonedev.twitterstackdemo.base.http.HttpUtils;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 import com.twitter.util.Duration;
 import com.twitter.util.Future;
@@ -38,7 +37,7 @@ public class DemoClient implements DemoApi {
 		log.debug("doSomething: message = " + message + " - delayMillis = " + delayMillis);
 
 		String url = "/";
-		HttpMethod method = HttpMethod.GET;
+		BaseHttpMethod method = BaseHttpMethod.GET;
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		parameters.put("message", Arrays.asList(new String[] { message }));
@@ -46,22 +45,23 @@ public class DemoClient implements DemoApi {
 
 		log.debug("doSomething: Sending request");
 
-		Future<HttpResponse> responseFuture = demoClientBase.call(url, method, null, parameters);
+		Future<BaseHttpResponse> responseFuture = demoClientBase.call(url, method, null, parameters);
 
 		log.debug("doSomething: Sent request");
 
 		long timeoutMillis = 1000L;
-		Try<HttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS.toNanos(timeoutMillis)));
+		Try<BaseHttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS
+				.toNanos(timeoutMillis)));
 
 		log.debug("doSomething: Got response");
 
 		String responseContent = null;
 
 		if (responseTry.isReturn()) {
-			HttpResponse response = responseTry.get();
-			responseContent = HttpUtils.getResponseContent(response);
+			BaseHttpResponse response = responseTry.get();
+			responseContent = response.getContent();
 		} else {
-			Throwable t = ((Throw<HttpResponse>) responseTry).e();
+			Throwable t = ((Throw<BaseHttpResponse>) responseTry).e();
 			log.error("doSomething: Error getting response", t);
 			throw new Exception(t);
 		}

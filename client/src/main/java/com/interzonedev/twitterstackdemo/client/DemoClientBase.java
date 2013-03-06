@@ -6,16 +6,15 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import ch.qos.logback.classic.Logger;
 
 import com.interzonedev.twitterstackdemo.base.http.AbstractHttpClientBase;
-import com.interzonedev.twitterstackdemo.base.http.HttpUtils;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.twitter.util.Future;
 
 @Named("demoClientBase")
@@ -56,19 +55,20 @@ public class DemoClientBase extends AbstractHttpClientBase {
 		return hostConnectionLimit;
 	}
 
-	protected Future<HttpResponse> call(String url, HttpMethod method, Map<String, List<String>> headers,
+	protected Future<BaseHttpResponse> call(String url, BaseHttpMethod method, Map<String, List<String>> headers,
 			Map<String, List<String>> parameters) {
 
-		HttpRequest request = HttpUtils.buildRequest(url, method, null, parameters);
+		String id = Integer.toString(hashCode());
 
-		log.debug("call: Sending request - " + request);
+		BaseHttpRequest baseRequest = new BaseHttpRequest(id, headers, null, url, method, parameters);
 
-		Future<HttpResponse> responseFuture = call(request);
+		log.debug("call: Sending baseRequest - " + baseRequest);
+
+		Future<BaseHttpResponse> baseResponseFuture = call(baseRequest);
 
 		log.debug("call: Sent request");
 
-		return responseFuture;
+		return baseResponseFuture;
 
 	}
-
 }

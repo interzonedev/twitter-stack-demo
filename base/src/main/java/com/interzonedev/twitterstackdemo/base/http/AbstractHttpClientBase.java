@@ -61,20 +61,29 @@ public abstract class AbstractHttpClientBase extends AbstractHttpBase {
 	/**
 	 * Meant to be called by the implementing subclass to perform an asynchronous HTTP request.
 	 * 
-	 * @param request
-	 *            The {@link HttpRequest} to be sent.
+	 * @param baseRequest
+	 *            The {@link BaseHttpRequest} to be sent.
 	 * 
-	 * @return Returns a {@link Future<HttpResponse>} that allows for asynchronously getting the response.
+	 * @return Returns a {@link Future<BaseHttpResponse>} that allows for asynchronously getting the response.
 	 */
-	protected Future<HttpResponse> call(HttpRequest request) {
+	protected Future<BaseHttpResponse> call(BaseHttpRequest baseRequest) {
 
-		log.debug("call: Sending request - " + request);
+		log.debug("call: Sending baseRequest - " + baseRequest);
 
+		HttpRequest request = getHttpRequest(baseRequest);
+
+		// TODO - Transform Future<HttpResponse> to Future<BaseHttpResponse>
 		Future<HttpResponse> responseFuture = httpClient.apply(request);
+
+		HttpResponse response = responseFuture.get();
+		@SuppressWarnings("unused")
+		BaseHttpResponse baseResponse = getBaseHttpResponse(response, baseRequest);
+
+		Future<BaseHttpResponse> baseResponseFuture = null;
 
 		log.debug("call: Sent request");
 
-		return responseFuture;
+		return baseResponseFuture;
 
 	}
 

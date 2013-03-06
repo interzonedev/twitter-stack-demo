@@ -7,14 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMessage;
+import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
@@ -69,6 +73,84 @@ public abstract class AbstractHttpBase {
 	}
 
 	/**
+	 * Creates an {@link HttpRequest} instance from the properties in the specified {@link BaseHttpRequest}.
+	 * 
+	 * @param baseRequest
+	 *            The {@link BaseHttpRequest} to use as the basis of creating the {@link HttpRequest} instance.
+	 * 
+	 * @return Returns an {@link HttpRequest} instance created from the properties in the specified
+	 *         {@link BaseHttpRequest}.
+	 */
+	protected HttpRequest getHttpRequest(BaseHttpRequest baseRequest) {
+
+		String url = baseRequest.getUrl();
+		HttpMethod method = HttpMethod.valueOf(baseRequest.getMethod().name());
+		Map<String, List<String>> parameters = baseRequest.getParameters();
+		Map<String, List<String>> headers = baseRequest.getHeaders();
+
+		StringBuilder urlWithParams = new StringBuilder(url);
+
+		String requestContent = getRequestContentFromParameters(parameters);
+
+		ChannelBuffer requestContentBuffer = null;
+
+		if (StringUtils.isNotBlank(requestContent)) {
+			if (HttpMethod.POST.equals(method) || HttpMethod.PUT.equals(method)) {
+				requestContentBuffer = ChannelBuffers.wrappedBuffer(requestContent.getBytes());
+			} else {
+
+				if (urlWithParams.indexOf("?") > 0) {
+					urlWithParams.append("&");
+				} else {
+					urlWithParams.append("?");
+				}
+				urlWithParams.append(requestContent);
+			}
+		}
+
+		HttpRequest request = new DefaultHttpRequest(HTTP_VERSION, method, urlWithParams.toString());
+
+		if (null != requestContentBuffer) {
+			request.setContent(requestContentBuffer);
+			request.addHeader(Names.CONTENT_LENGTH, requestContent.length());
+		}
+
+		if (null != headers) {
+			for (String headerName : headers.keySet()) {
+				List<String> headerValues = headers.get(headerName);
+				for (String headerValue : headerValues) {
+					request.addHeader(headerName, headerValue);
+				}
+			}
+		}
+
+		return request;
+
+	}
+
+	/**
+	 * Creates an {@link BaseHttpResponse} instance from the properties in the specified {@link HttpResponse}.
+	 * 
+	 * @param response
+	 *            The {@link HttpResponse} to use as the basis of creating the {@link BaseHttpResponse} instance.
+	 * 
+	 * @return Returns an {@link BaseHttpResponse} instance created from the properties in the specified
+	 *         {@link HttpResponse}.
+	 */
+	protected BaseHttpResponse getBaseHttpResponse(HttpResponse response, BaseHttpRequest baseRequest) {
+
+		Map<String, List<String>> headers = getHeadersFromMessage(response);
+
+		String content = getResponseContent(response);
+
+		int status = response.getStatus().getCode();
+
+		BaseHttpResponse baseResponse = new BaseHttpResponse(baseRequest, headers, content, status);
+
+		return baseResponse;
+	}
+
+	/**
 	 * Creates an {@link HttpResponse} instance from the properties in the specified {@link BaseHttpResponse}.
 	 * 
 	 * @param baseResponse
@@ -88,6 +170,30 @@ public abstract class AbstractHttpBase {
 		HttpResponse reponse = buildResponse(status, headers, content);
 
 		return reponse;
+
+	}
+	
+	/**
+	 * Creates a {@link HttpResponse} instance from the specified parameters.
+	 * 
+	 * @param status
+	 *            - The {@link HttpResponseStatus} of the response.
+	 * @param headers
+	 *            - The headers that should be added to the response if not null.
+	 * @param content
+	 *            - The content to be set as the body of the response if not null.
+	 * 
+	 * @return Returns a {@link HttpResponse} instance created from the specified parameters.
+	 */
+	protected HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers, String content) {
+
+		HttpResponse response = new DefaultHttpResponse(HTTP_VERSION, status);
+
+		addHeadersToMessage(response, headers);
+
+		setContentInResponse(response, content);
+
+		return response;
 
 	}
 
@@ -122,30 +228,7 @@ public abstract class AbstractHttpBase {
 
 	}
 
-	/**
-	 * Creates a {@link HttpResponse} instance from the specified parameters.
-	 * 
-	 * @param status
-	 *            - The {@link HttpResponseStatus} of the response.
-	 * @param headers
-	 *            - The headers that should be added to the response if not null.
-	 * @param content
-	 *            - The content to be set as the body of the response if not null.
-	 * 
-	 * @return Returns a {@link HttpResponse} instance created from the specified parameters.
-	 */
-	protected HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers, String content) {
-
-		HttpResponse response = new DefaultHttpResponse(HTTP_VERSION, status);
-
-		addHeadersToMessage(response, headers);
-
-		setContentInResponse(response, content);
-
-		return response;
-
-	}
-
+	
 	/**
 	 * Transforms the headers in the specified {@link HttpMessage} into a map.
 	 * 
@@ -267,4 +350,19 @@ public abstract class AbstractHttpBase {
 
 	}
 
+	/**
+	 * Gets the body of the specified {@link HttpResponse}.
+	 * 
+	 * @param response
+	 *            The {@link HttpResponse} from which to get the body.
+	 * 
+	 * @return Returns the body of the specified {@link HttpResponse}.
+	 */
+	protected String getResponseContent(HttpResponse response) {
+
+		String responseContent = response.getContent().toString(Charset.defaultCharset());
+
+		return responseContent;
+
+	}
 }
