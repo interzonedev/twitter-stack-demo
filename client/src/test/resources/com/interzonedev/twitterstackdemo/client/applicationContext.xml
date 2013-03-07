@@ -11,16 +11,4 @@
 
 	<context:component-scan base-package="com.interzonedev.twitterstackdemo.client" />
 
-	<context:property-placeholder location="classpath:com/interzonedev/twitterstackdemo/client/threadpool.properties" />
-
-	<bean id="httpQueue" class="java.util.concurrent.LinkedBlockingQueue" />
-
-	<bean id="httpThreadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdown">
-		<constructor-arg index="0" value="${http.workerpool.core_thread_pool_size}" />
-		<constructor-arg index="1" value="${http.workerpool.max_thread_pool_size}" />
-		<constructor-arg index="2" value="${http.workerpool.keep_alive_seconds}" />
-		<constructor-arg index="3" type="java.util.concurrent.TimeUnit" value="SECONDS" />
-		<constructor-arg index="4" ref="httpQueue" />
-	</bean>
-
 </beans>
