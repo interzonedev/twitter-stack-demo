@@ -6,6 +6,11 @@ import java.util.Map;
 import com.interzonedev.twitterstackdemo.base.BaseRequest;
 import com.interzonedev.twitterstackdemo.base.BaseResponse;
 
+/**
+ * Immutable value object for representing HTTP responses.
+ * 
+ * @author mmarkarian
+ */
 public class BaseHttpResponse extends BaseResponse {
 
 	private final int status;

@@ -49,6 +49,8 @@ public class DemoClient implements DemoApi {
 
 		log.debug("doSomething: Sent request");
 
+		log.debug("doSomething: Blocking the thread to get the response");
+
 		long timeoutMillis = 1000L;
 		Try<BaseHttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS
 				.toNanos(timeoutMillis)));

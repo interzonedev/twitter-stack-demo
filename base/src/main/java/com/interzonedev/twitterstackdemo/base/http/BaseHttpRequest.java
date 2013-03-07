@@ -8,6 +8,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.interzonedev.twitterstackdemo.base.BaseRequest;
 
+/**
+ * Immutable value object for representing HTTP requests.
+ * 
+ * @author mmarkarian
+ */
 public class BaseHttpRequest extends BaseRequest {
 
 	private final String url;

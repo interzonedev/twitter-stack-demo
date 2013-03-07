@@ -7,9 +7,13 @@ import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ClientBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
+import com.twitter.util.FutureTransformer;
 
 /**
  * Abstract super class for all client implementations using HTTP as the transport mechanism.
+ * 
+ * Uses <a href="http://twitter.github.com/finagle/" target="_blank">Twitter Finagle</a> as an implementation of the
+ * HTTP transport layer.
  * 
  * @author mmarkarian
  */
@@ -66,20 +70,23 @@ public abstract class AbstractHttpClientBase extends AbstractHttpBase {
 	 * 
 	 * @return Returns a {@link Future<BaseHttpResponse>} that allows for asynchronously getting the response.
 	 */
-	protected Future<BaseHttpResponse> call(BaseHttpRequest baseRequest) {
+	protected Future<BaseHttpResponse> call(final BaseHttpRequest baseRequest) {
 
 		log.debug("call: Sending baseRequest - " + baseRequest);
 
 		HttpRequest request = getHttpRequest(baseRequest);
 
-		// TODO - Transform Future<HttpResponse> to Future<BaseHttpResponse>
 		Future<HttpResponse> responseFuture = httpClient.apply(request);
 
-		HttpResponse response = responseFuture.get();
-		@SuppressWarnings("unused")
-		BaseHttpResponse baseResponse = getBaseHttpResponse(response, baseRequest);
-
-		Future<BaseHttpResponse> baseResponseFuture = null;
+		Future<BaseHttpResponse> baseResponseFuture = responseFuture
+				.transformedBy(new FutureTransformer<HttpResponse, BaseHttpResponse>() {
+					@Override
+					public BaseHttpResponse map(HttpResponse response) {
+						log.debug("FutureTransformer.map: Received response - " + response);
+						BaseHttpResponse baseResponse = getBaseHttpResponse(response, baseRequest);
+						return baseResponse;
+					}
+				});
 
 		log.debug("call: Sent request");
 

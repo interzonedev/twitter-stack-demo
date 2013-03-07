@@ -4,6 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Top level immutable value object for representing responses independent of the transport mechanism.
+ * 
+ * @author mmarkarian
+ */
 public class BaseResponse {
 
 	private final BaseRequest request;

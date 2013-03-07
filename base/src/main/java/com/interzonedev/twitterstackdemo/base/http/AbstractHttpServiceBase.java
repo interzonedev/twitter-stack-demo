@@ -14,6 +14,9 @@ import com.twitter.util.Future;
 /**
  * Abstract super class for all service implementations using HTTP as the transport mechanism.
  * 
+ * Uses <a href="http://twitter.github.com/finagle/" target="_blank">Twitter Finagle</a> as an implementation of the
+ * HTTP transport layer.
+ * 
  * @author mmarkarian
  */
 public abstract class AbstractHttpServiceBase extends AbstractHttpBase {

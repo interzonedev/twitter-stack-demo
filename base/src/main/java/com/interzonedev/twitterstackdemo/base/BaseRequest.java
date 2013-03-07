@@ -6,6 +6,11 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Top level immutable value object for representing requests independent of the transport mechanism.
+ * 
+ * @author mmarkarian
+ */
 public class BaseRequest {
 
 	private final String id;

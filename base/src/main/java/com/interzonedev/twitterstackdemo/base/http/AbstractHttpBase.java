@@ -27,6 +27,9 @@ import ch.qos.logback.classic.Logger;
  * Abstract super class for all client and service implementations using HTTP as the transport mechanism. Contains
  * helper methods common to both the client and the service.
  * 
+ * Uses <a href="http://twitter.github.com/finagle/" target="_blank">Twitter Finagle</a> as an implementation of the
+ * HTTP transport layer.
+ * 
  * @author mmarkarian
  */
 public abstract class AbstractHttpBase {
@@ -172,7 +175,7 @@ public abstract class AbstractHttpBase {
 		return reponse;
 
 	}
-	
+
 	/**
 	 * Creates a {@link HttpResponse} instance from the specified parameters.
 	 * 
@@ -228,7 +231,6 @@ public abstract class AbstractHttpBase {
 
 	}
 
-	
 	/**
 	 * Transforms the headers in the specified {@link HttpMessage} into a map.
 	 * 
