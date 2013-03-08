@@ -61,7 +61,10 @@ public class DemoClient implements DemoApi {
 
 		if (responseTry.isReturn()) {
 			BaseHttpResponse response = responseTry.get();
-			responseContent = response.getContent();
+			byte[] responseContentBytes = response.getContent();
+			if (null != responseContentBytes) {
+				responseContent = new String(responseContentBytes);
+			}
 		} else {
 			Throwable t = ((Throw<BaseHttpResponse>) responseTry).e();
 			log.error("doSomething: Error getting response", t);

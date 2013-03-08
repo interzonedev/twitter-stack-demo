@@ -15,9 +15,9 @@ public class BaseResponse {
 
 	private final Map<String, List<String>> headers;
 
-	private final String content;
+	private final byte[] content;
 
-	public BaseResponse(BaseRequest request, Map<String, List<String>> headers, String content) {
+	public BaseResponse(BaseRequest request, Map<String, List<String>> headers, byte[] content) {
 		this.request = request;
 
 		if (null == headers) {
@@ -37,7 +37,7 @@ public class BaseResponse {
 		return headers;
 	}
 
-	public String getContent() {
+	public byte[] getContent() {
 		return content;
 	}
 

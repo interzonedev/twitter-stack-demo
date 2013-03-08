@@ -60,16 +60,19 @@ public abstract class AbstractHttpBase {
 
 		Map<String, List<String>> parameters = getParametersFromRequest(request);
 
-		String content = null;
+		byte[] contentBytes = null;
 
 		switch (method) {
 			case POST:
 			case PUT:
-				content = getRequestContentFromParameters(parameters);
+				String content = getRequestContentFromParameters(parameters);
+				if (StringUtils.isNotBlank(content)) {
+					contentBytes = content.getBytes();
+				}
 				break;
 		}
 
-		BaseHttpRequest baseRequest = new BaseHttpRequest(id, headers, content, url, method, parameters);
+		BaseHttpRequest baseRequest = new BaseHttpRequest(id, headers, contentBytes, url, method, parameters);
 
 		return baseRequest;
 
@@ -144,7 +147,7 @@ public abstract class AbstractHttpBase {
 
 		Map<String, List<String>> headers = getHeadersFromMessage(response);
 
-		String content = getResponseContent(response);
+		byte[] content = getResponseContent(response);
 
 		int status = response.getStatus().getCode();
 
@@ -168,7 +171,7 @@ public abstract class AbstractHttpBase {
 
 		Map<String, List<String>> headers = baseResponse.getHeaders();
 
-		String content = baseResponse.getContent();
+		byte[] content = baseResponse.getContent();
 
 		HttpResponse reponse = buildResponse(status, headers, content);
 
@@ -180,15 +183,15 @@ public abstract class AbstractHttpBase {
 	 * Creates a {@link HttpResponse} instance from the specified parameters.
 	 * 
 	 * @param status
-	 *            - The {@link HttpResponseStatus} of the response.
+	 *            The {@link HttpResponseStatus} of the response.
 	 * @param headers
-	 *            - The headers that should be added to the response if not null.
+	 *            The headers that should be added to the response if not null.
 	 * @param content
-	 *            - The content to be set as the body of the response if not null.
+	 *            The byte array representation of the content to be set as the body of the response if not null.
 	 * 
 	 * @return Returns a {@link HttpResponse} instance created from the specified parameters.
 	 */
-	protected HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers, String content) {
+	protected HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers, byte[] content) {
 
 		HttpResponse response = new DefaultHttpResponse(HTTP_VERSION, status);
 
@@ -198,6 +201,26 @@ public abstract class AbstractHttpBase {
 
 		return response;
 
+	}
+
+	/**
+	 * Creates a {@link HttpResponse} instance from the specified parameters.
+	 * 
+	 * @param status
+	 *            The {@link HttpResponseStatus} of the response.
+	 * @param headers
+	 *            The headers that should be added to the response if not null.
+	 * @param content
+	 *            The string representation of the content to be set as the body of the response if not null.
+	 * 
+	 * @return Returns a {@link HttpResponse} instance created from the specified parameters.
+	 */
+	protected HttpResponse buildResponse(HttpResponseStatus status, Map<String, List<String>> headers, String content) {
+		byte[] contentBytes = null;
+		if (StringUtils.isNotBlank(content)) {
+			contentBytes = content.getBytes();
+		}
+		return buildResponse(status, headers, contentBytes);
 	}
 
 	/**
@@ -290,10 +313,10 @@ public abstract class AbstractHttpBase {
 	 * @param content
 	 *            The content to set in the {@link HttpResponse}.
 	 */
-	protected void setContentInResponse(HttpResponse response, String content) {
+	protected void setContentInResponse(HttpResponse response, byte[] content) {
 
-		if (StringUtils.isNotBlank(content)) {
-			response.setContent(ChannelBuffers.wrappedBuffer(content.getBytes()));
+		if (null != content) {
+			response.setContent(ChannelBuffers.wrappedBuffer(content));
 		}
 
 	}
@@ -353,16 +376,21 @@ public abstract class AbstractHttpBase {
 	}
 
 	/**
-	 * Gets the body of the specified {@link HttpResponse}.
+	 * Gets the body of the specified {@link HttpResponse} as a byte array.
 	 * 
 	 * @param response
 	 *            The {@link HttpResponse} from which to get the body.
 	 * 
-	 * @return Returns the body of the specified {@link HttpResponse}.
+	 * @return Returns the body of the specified {@link HttpResponse} as a byte array. Returns null if the content is
+	 *         null.
 	 */
-	protected String getResponseContent(HttpResponse response) {
+	protected byte[] getResponseContent(HttpResponse response) {
 
-		String responseContent = response.getContent().toString(Charset.defaultCharset());
+		byte[] responseContent = null;
+
+		if (null != response.getContent()) {
+			responseContent = response.getContent().array();
+		}
 
 		return responseContent;
 

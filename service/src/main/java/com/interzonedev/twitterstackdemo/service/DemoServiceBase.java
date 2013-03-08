@@ -100,7 +100,12 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 
 		}
 
-		BaseHttpResponse response = new BaseHttpResponse(request, null, content, status);
+		byte[] contentBytes = null;
+		if (StringUtils.isNotBlank(content)) {
+			contentBytes = content.getBytes();
+		}
+
+		BaseHttpResponse response = new BaseHttpResponse(request, null, contentBytes, status);
 
 		return response;
 	}

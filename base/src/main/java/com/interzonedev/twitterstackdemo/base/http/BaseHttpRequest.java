@@ -21,7 +21,7 @@ public class BaseHttpRequest extends BaseRequest {
 
 	private final Map<String, List<String>> parameters;
 
-	public BaseHttpRequest(String id, Map<String, List<String>> headers, String content, String url,
+	public BaseHttpRequest(String id, Map<String, List<String>> headers, byte[] content, String url,
 			BaseHttpMethod method, Map<String, List<String>> parameters) {
 
 		super(id, headers, content);

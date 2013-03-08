@@ -17,9 +17,9 @@ public class BaseRequest {
 
 	private final Map<String, List<String>> headers;
 
-	private final String content;
+	private final byte[] content;
 
-	public BaseRequest(String id, Map<String, List<String>> headers, String content) {
+	public BaseRequest(String id, Map<String, List<String>> headers, byte[] content) {
 
 		if (StringUtils.isBlank(id)) {
 			throw new IllegalArgumentException("The id must be set");
@@ -44,7 +44,7 @@ public class BaseRequest {
 		return headers;
 	}
 
-	public String getContent() {
+	public byte[] getContent() {
 		return content;
 	}
 

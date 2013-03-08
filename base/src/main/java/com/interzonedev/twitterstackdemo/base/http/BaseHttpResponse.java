@@ -15,7 +15,7 @@ public class BaseHttpResponse extends BaseResponse {
 
 	private final int status;
 
-	public BaseHttpResponse(BaseRequest request, Map<String, List<String>> headers, String content, int status) {
+	public BaseHttpResponse(BaseRequest request, Map<String, List<String>> headers, byte[] content, int status) {
 		super(request, headers, content);
 		this.status = status;
 	}
