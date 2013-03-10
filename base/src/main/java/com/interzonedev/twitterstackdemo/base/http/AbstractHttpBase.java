@@ -34,9 +34,19 @@ import ch.qos.logback.classic.Logger;
  */
 public abstract class AbstractHttpBase {
 
+	public static final String SEND_REQUEST_HEADER_NAME = "base-send-request";
+
 	private static final HttpVersion HTTP_VERSION = HttpVersion.HTTP_1_1;
 
 	protected final Logger log = (Logger) LoggerFactory.getLogger(getClass());
+
+	protected boolean isSendRequest(BaseHttpRequest baseRequest) {
+
+		List<String> sendRequestHeaders = baseRequest.getHeaders().get(SEND_REQUEST_HEADER_NAME);
+
+		return (null != sendRequestHeaders);
+
+	}
 
 	/**
 	 * Creates an {@link BaseHttpRequest} instance from the properties in the specified {@link HttpRequest}.
@@ -124,8 +134,12 @@ public abstract class AbstractHttpBase {
 		if (null != headers) {
 			for (String headerName : headers.keySet()) {
 				List<String> headerValues = headers.get(headerName);
-				for (String headerValue : headerValues) {
-					request.addHeader(headerName, headerValue);
+				if (null != headerValues) {
+					for (String headerValue : headerValues) {
+						request.addHeader(headerName, headerValue);
+					}
+				} else {
+					request.addHeader(headerName, "");
 				}
 			}
 		}

@@ -11,4 +11,10 @@
 
 	<context:component-scan base-package="com.interzonedev.twitterstackdemo.client" />
 
+	<bean id="httpClientBase" class="com.interzonedev.twitterstackdemo.base.http.HttpClientBase" init-method="init">
+		<constructor-arg index="0" value="${http.service.hostName}" />
+		<constructor-arg index="1" value="${http.service.port}" />
+		<constructor-arg index="2" value="${http.service.hostConnectionLimit}" />
+	</bean>
+
 </beans>

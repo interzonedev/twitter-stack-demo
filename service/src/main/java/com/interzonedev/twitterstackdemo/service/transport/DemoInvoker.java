@@ -1,25 +1,23 @@
-package com.interzonedev.twitterstackdemo.service;
+package com.interzonedev.twitterstackdemo.service.transport;
 
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import ch.qos.logback.classic.Logger;
 
-import com.interzonedev.twitterstackdemo.base.http.AbstractHttpServiceBase;
+import com.interzonedev.twitterstackdemo.base.Invoker;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 
-@Named("demoServiceBase")
-public class DemoServiceBase extends AbstractHttpServiceBase {
+@Named("demoInvoker")
+public class DemoInvoker implements Invoker<BaseHttpRequest, BaseHttpResponse> {
 
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
@@ -27,43 +25,10 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 	@Named("demoService")
 	private DemoApi demoService;
 
-	@Value("#{serviceProperties.serverName}")
-	private String serviceName;
-
-	@Value("#{serviceProperties.hostName}")
-	private String serviceHostName;
-
-	@Value("#{serviceProperties.port}")
-	private int servicePort;
-
-	@PostConstruct
-	public void init() {
-
-		log.info("Launching service");
-
-		launch();
-
-	}
-
 	@Override
-	protected String getServiceName() {
-		return serviceName;
-	}
+	public BaseHttpResponse invoke(BaseHttpRequest request) {
 
-	@Override
-	protected String getServiceHostName() {
-		return serviceHostName;
-	}
-
-	@Override
-	protected int getServicePort() {
-		return servicePort;
-	}
-
-	@Override
-	protected BaseHttpResponse call(BaseHttpRequest request) {
-
-		log.debug("call: Received request - " + request);
+		log.debug("invoke: Received request - " + request);
 
 		String content = null;
 		int status = 500;
@@ -83,7 +48,7 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 				try {
 					delayMillis = Long.parseLong(delayMillsValue);
 				} catch (NumberFormatException nfe) {
-					log.warn("call: Error converting " + delayMillsValue + " to a long");
+					log.warn("invoke: Error converting " + delayMillsValue + " to a long");
 				}
 			}
 
@@ -92,7 +57,7 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 
 		} catch (Throwable t) {
 
-			log.error("call: Error executing service", t);
+			log.error("invoke: Error executing service", t);
 			content = "Error executing service";
 			if (StringUtils.isNotBlank(t.getMessage())) {
 				content += ":" + t.getMessage();
@@ -108,6 +73,7 @@ public class DemoServiceBase extends AbstractHttpServiceBase {
 		BaseHttpResponse response = new BaseHttpResponse(request, null, contentBytes, status);
 
 		return response;
+
 	}
 
 }

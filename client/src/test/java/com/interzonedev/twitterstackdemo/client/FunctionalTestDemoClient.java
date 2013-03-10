@@ -13,17 +13,25 @@ public class FunctionalTestDemoClient extends AbstractTest {
 	private DemoClient demoClient;
 
 	@Test
-	public void testMakeRequest() throws Exception {
+	public void testDoSomething() throws Exception {
 
-		log.debug("testMakeRequest: Start");
+		log.debug("testDoSomething: Start");
 
 		String responseContent = demoClient.doSomething("Foo", 500);
 
-		log.debug("testMakeRequest: responseContent = " + responseContent);
+		log.debug("testDoSomething: responseContent = " + responseContent);
 
 		Assert.assertTrue(responseContent.contains("currentTimeMillis"));
 		Assert.assertTrue(responseContent.contains("message"));
 
 	}
 
+	@Test
+	public void testDoAnotherThing() throws Exception {
+
+		log.debug("testDoAnotherThing: Start");
+
+		demoClient.doAnotherThing("Foo");
+
+	}
 }

@@ -6,20 +6,25 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
+import com.interzonedev.twitterstackdemo.base.Invoker;
+import com.interzonedev.twitterstackdemo.base.Receiver;
+import com.interzonedev.twitterstackdemo.base.ServiceBase;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ServerBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 
-/**
- * Abstract super class for all service implementations using HTTP as the transport mechanism.
- * 
- * Uses <a href="http://twitter.github.com/finagle/" target="_blank">Twitter Finagle</a> as an implementation of the
- * HTTP transport layer.
- * 
- * @author mmarkarian
- */
-public abstract class AbstractHttpServiceBase extends AbstractHttpBase {
+public class HttpServiceBase extends AbstractHttpBase implements ServiceBase<BaseHttpRequest, BaseHttpResponse> {
+
+	private final String serviceName;
+
+	private final String serviceHostName;
+
+	private final int servicePort;
+
+	private final Invoker<BaseHttpRequest, BaseHttpResponse> invoker;
+
+	private final Receiver<BaseHttpRequest, BaseHttpResponse> receiver;
 
 	/**
 	 * Anonymous implementation of the abstract {@link Service} class to receive, delegate and return HTTP requests.
@@ -45,7 +50,13 @@ public abstract class AbstractHttpServiceBase extends AbstractHttpBase {
 			try {
 				BaseHttpRequest baseRequest = getBaseHttpRequest(request);
 
-				BaseHttpResponse baseResponse = call(baseRequest);
+				BaseHttpResponse baseResponse = null;
+
+				if (isSendRequest(baseRequest)) {
+					baseResponse = receiver.receive(baseRequest);
+				} else {
+					baseResponse = invoker.invoke(baseRequest);
+				}
 
 				response = getHttpResponse(baseResponse);
 			} catch (Throwable t) {
@@ -63,16 +74,20 @@ public abstract class AbstractHttpServiceBase extends AbstractHttpBase {
 
 	};
 
+	public HttpServiceBase(String serviceName, String serviceHostName, int servicePort,
+			Invoker<BaseHttpRequest, BaseHttpResponse> invoker, Receiver<BaseHttpRequest, BaseHttpResponse> receiver) {
+		this.serviceName = serviceName;
+		this.serviceHostName = serviceHostName;
+		this.servicePort = servicePort;
+		this.invoker = invoker;
+		this.receiver = receiver;
+	}
+
 	/**
-	 * Gets the necessary parameters from the implementing subclass and starts the service.
+	 * Starts the service.
 	 */
-	protected void launch() {
-
-		String serviceName = getServiceName();
-
-		String serviceHostName = getServiceHostName();
-
-		int servicePort = getServicePort();
+	@Override
+	public void launch() {
 
 		log.info("launch: Starting service \"" + serviceName + "\" at http://" + serviceHostName + ":" + servicePort);
 
@@ -82,36 +97,5 @@ public abstract class AbstractHttpServiceBase extends AbstractHttpBase {
 						.bindTo(new InetSocketAddress(serviceHostName, servicePort)));
 
 	}
-
-	/**
-	 * Allows the implementing subclass to specify the service name.
-	 * 
-	 * @return Returns the name of the service managed by this instance.
-	 */
-	protected abstract String getServiceName();
-
-	/**
-	 * Allows the implementing subclass to specify the service host name.
-	 * 
-	 * @return Returns the hostname of the service managed by this instance.
-	 */
-	protected abstract String getServiceHostName();
-
-	/**
-	 * Allows the implementing subclass to specify the service port.
-	 * 
-	 * @return Returns the port of the service managed by this instance.
-	 */
-	protected abstract int getServicePort();
-
-	/**
-	 * Delegates the work to respond to thr request to the implementing subclass.
-	 * 
-	 * @param request
-	 *            The current {@link BaseHttpRequest}.
-	 * 
-	 * @return Returns the {@link BaseHttpResponse} created by the implementing subclass.
-	 */
-	protected abstract BaseHttpResponse call(BaseHttpRequest request);
 
 }

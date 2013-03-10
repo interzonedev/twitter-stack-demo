@@ -39,4 +39,11 @@ public class DemoService implements DemoApi {
 		return responseContent;
 	}
 
+	@Override
+	public void doAnotherThing(String message) throws Exception {
+
+		log.debug("doAnotherThing: Received message = " + message);
+
+	}
+
 }
