@@ -14,4 +14,31 @@
 
 	<name>twitter-stack-demo-base</name>
 
+	<repositories>
+		<repository>
+			<id>twitter</id>
+			<url>http://maven.twttr.com/</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twitter</groupId>
+			<artifactId>finagle-core</artifactId>
+			<version>6.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.twitter</groupId>
+			<artifactId>finagle-http</artifactId>
+			<version>6.1.0</version>
+		</dependency>
+	</dependencies>
+
 </project>

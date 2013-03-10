@@ -40,13 +40,6 @@
 		<spring.version>3.2.0.RELEASE</spring.version>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>twitter</id>
-			<url>http://maven.twttr.com/</url>
-		</repository>
-	</repositories>
-
 	<build>
 		<plugins>
 			<!-- Compile with source and build at Java 1.6. -->
@@ -67,18 +60,6 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.9</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.twitter</groupId>
-			<artifactId>finagle-core</artifactId>
-			<version>6.1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.twitter</groupId>
-			<artifactId>finagle-http</artifactId>
-			<version>6.1.0</version>
 		</dependency>
 
 		<dependency>
