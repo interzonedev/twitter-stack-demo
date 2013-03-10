@@ -1,4 +1,4 @@
-package com.interzonedev.twitterstackdemo.base.http;
+package com.interzonedev.twitterstackdemo.base.http.finagle;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +8,16 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.interzonedev.twitterstackdemo.base.ClientBase;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ClientBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 import com.twitter.util.FutureTransformer;
 
-public class HttpClientBase extends AbstractHttpBase implements ClientBase<BaseHttpRequest, BaseHttpResponse> {
+public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
+		ClientBase<BaseHttpRequest, BaseHttpResponse> {
 
 	private final String serviceHostName;
 
@@ -24,7 +27,7 @@ public class HttpClientBase extends AbstractHttpBase implements ClientBase<BaseH
 
 	private Service<HttpRequest, HttpResponse> httpClient;
 
-	public HttpClientBase(String serviceHostName, int servicePort, int hostConnectionLimit) {
+	public FinagleHttpClientBase(String serviceHostName, int servicePort, int hostConnectionLimit) {
 		this.serviceHostName = serviceHostName;
 		this.servicePort = servicePort;
 		this.hostConnectionLimit = hostConnectionLimit;

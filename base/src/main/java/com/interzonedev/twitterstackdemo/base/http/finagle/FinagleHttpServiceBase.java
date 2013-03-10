@@ -1,4 +1,4 @@
-package com.interzonedev.twitterstackdemo.base.http;
+package com.interzonedev.twitterstackdemo.base.http.finagle;
 
 import java.net.InetSocketAddress;
 
@@ -9,12 +9,15 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import com.interzonedev.twitterstackdemo.base.Invoker;
 import com.interzonedev.twitterstackdemo.base.Receiver;
 import com.interzonedev.twitterstackdemo.base.ServiceBase;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.builder.ServerBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 
-public class HttpServiceBase extends AbstractHttpBase implements ServiceBase<BaseHttpRequest, BaseHttpResponse> {
+public class FinagleHttpServiceBase extends AbstractFinagleHttpBase implements
+		ServiceBase<BaseHttpRequest, BaseHttpResponse> {
 
 	private final String serviceName;
 
@@ -74,7 +77,7 @@ public class HttpServiceBase extends AbstractHttpBase implements ServiceBase<Bas
 
 	};
 
-	public HttpServiceBase(String serviceName, String serviceHostName, int servicePort,
+	public FinagleHttpServiceBase(String serviceName, String serviceHostName, int servicePort,
 			Invoker<BaseHttpRequest, BaseHttpResponse> invoker, Receiver<BaseHttpRequest, BaseHttpResponse> receiver) {
 		this.serviceName = serviceName;
 		this.serviceHostName = serviceHostName;

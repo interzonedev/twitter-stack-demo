@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import scala.actors.threadpool.Arrays;
 import ch.qos.logback.classic.Logger;
 
+import com.interzonedev.twitterstackdemo.base.ClientBase;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
-import com.interzonedev.twitterstackdemo.base.http.HttpClientBase;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 import com.twitter.util.Duration;
 import com.twitter.util.Future;
@@ -31,7 +31,7 @@ public class DemoClient implements DemoApi {
 
 	@Inject
 	@Named("httpClientBase")
-	private HttpClientBase httpClientBase;
+	private ClientBase<BaseHttpRequest, BaseHttpResponse> httpClientBase;
 
 	@SuppressWarnings("unchecked")
 	@Override

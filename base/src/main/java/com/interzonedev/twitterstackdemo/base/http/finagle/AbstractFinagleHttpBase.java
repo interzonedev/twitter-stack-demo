@@ -1,4 +1,4 @@
-package com.interzonedev.twitterstackdemo.base.http;
+package com.interzonedev.twitterstackdemo.base.http.finagle;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -12,16 +12,20 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
 import org.jboss.netty.handler.codec.http.HttpMessage;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.codec.http.HttpHeaders.Names;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
+
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
+import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 
 /**
  * Abstract super class for all client and service implementations using HTTP as the transport mechanism. Contains
@@ -32,7 +36,7 @@ import ch.qos.logback.classic.Logger;
  * 
  * @author mmarkarian
  */
-public abstract class AbstractHttpBase {
+public abstract class AbstractFinagleHttpBase {
 
 	public static final String SEND_REQUEST_HEADER_NAME = "base-send-request";
 
