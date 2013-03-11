@@ -3,7 +3,8 @@ package com.interzonedev.twitterstackdemo.base;
 /**
  * Common API for allowing an implementation of {@link ServiceBase} to call a specific method on a specific service
  * where a response with content is expected. Implementations determine which service method to call depending on the
- * properties of the incoming request.
+ * properties of the incoming request. Instances implementing this interface are meant to be injected into
+ * implementations of {@link ServiceBase}.
  * 
  * @author interzone
  * 

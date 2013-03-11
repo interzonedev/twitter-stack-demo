@@ -24,6 +24,12 @@ import com.twitter.util.Future;
 import com.twitter.util.Throw;
 import com.twitter.util.Try;
 
+/**
+ * Client implementation of {@link DemoApi}. Creats the necessary instance of {@link BaseHttpRequest} to make the remote
+ * service call for each method.
+ * 
+ * @author interzone
+ */
 @Named("demoClient")
 public class DemoClient implements DemoApi {
 
@@ -33,6 +39,11 @@ public class DemoClient implements DemoApi {
 	@Named("httpClientBase")
 	private ClientBase<BaseHttpRequest, BaseHttpResponse> httpClientBase;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.interzonedev.twitterstackdemo.common.DemoApi#doSomething(java.lang.String, long)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public String doSomething(String message, long delayMillis) throws Exception {
@@ -83,6 +94,11 @@ public class DemoClient implements DemoApi {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.interzonedev.twitterstackdemo.common.DemoApi#doAnotherThing(java.lang.String)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doAnotherThing(String message) throws Exception {

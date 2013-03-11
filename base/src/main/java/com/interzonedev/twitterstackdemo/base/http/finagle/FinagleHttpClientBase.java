@@ -16,6 +16,12 @@ import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 import com.twitter.util.FutureTransformer;
 
+/**
+ * <a href="http://twitter.github.com/finagle" target="_blank">Twitter Finagle</a> specific implementation of
+ * {@link ClientBase}.
+ * 
+ * @author interzone
+ */
 public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 		ClientBase<BaseHttpRequest, BaseHttpResponse> {
 
@@ -33,6 +39,9 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 		this.hostConnectionLimit = hostConnectionLimit;
 	}
 
+	/**
+	 * Creates the client for making remote requests.
+	 */
 	@Override
 	public void init() {
 		log.info("init: Creating client for http://" + serviceHostName + ":" + servicePort + " with connection limit "
@@ -43,6 +52,9 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 
 	}
 
+	/**
+	 * Twitter Finagle specific implementation of {@link ClientBase#call(Object)}.
+	 */
 	@Override
 	public Future<BaseHttpResponse> call(final BaseHttpRequest baseRequest) {
 
@@ -68,6 +80,10 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 
 	}
 
+	/**
+	 * Twitter Finagle specific implementation of {@link ClientBase#send(Object)}. Adds the
+	 * {@link AbstractFinagleHttpBase#SEND_REQUEST_HEADER_NAME} header to the request to mark it as a send request.
+	 */
 	@Override
 	public Future<BaseHttpResponse> send(BaseHttpRequest baseRequest) {
 

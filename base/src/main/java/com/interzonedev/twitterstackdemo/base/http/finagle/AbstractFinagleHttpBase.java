@@ -31,7 +31,7 @@ import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
  * Abstract super class for all client and service implementations using HTTP as the transport mechanism. Contains
  * helper methods common to both the client and the service.
  * 
- * Uses <a href="http://twitter.github.com/finagle/" target="_blank">Twitter Finagle</a> as an implementation of the
+ * Uses <a href="http://twitter.github.com/finagle" target="_blank">Twitter Finagle</a> as an implementation of the
  * HTTP transport layer.
  * 
  * @author mmarkarian

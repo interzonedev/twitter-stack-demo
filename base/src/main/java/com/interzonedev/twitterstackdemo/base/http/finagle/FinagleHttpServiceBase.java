@@ -16,6 +16,12 @@ import com.twitter.finagle.builder.ServerBuilder;
 import com.twitter.finagle.http.Http;
 import com.twitter.util.Future;
 
+/**
+ * <a href="http://twitter.github.com/finagle" target="_blank">Twitter Finagle</a> specific implementation of
+ * {@link ServiceBase}.
+ * 
+ * @author interzone
+ */
 public class FinagleHttpServiceBase extends AbstractFinagleHttpBase implements
 		ServiceBase<BaseHttpRequest, BaseHttpResponse> {
 

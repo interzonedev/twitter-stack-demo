@@ -16,6 +16,12 @@ import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 
+/**
+ * Implementation of {@link Invoker<BaseHttpRequest, BaseHttpResponse>} specific to the service implementation of
+ * {@link DemoApi}.
+ * 
+ * @author interzone
+ */
 @Named("demoInvoker")
 public class DemoInvoker implements Invoker<BaseHttpRequest, BaseHttpResponse> {
 
@@ -25,6 +31,16 @@ public class DemoInvoker implements Invoker<BaseHttpRequest, BaseHttpResponse> {
 	@Named("demoService")
 	private DemoApi demoService;
 
+	/**
+	 * Determines which method to call on the service implementation of {@link DemoApi} based on the properties of the
+	 * incomong {@link BaseHttpRequest}.
+	 * 
+	 * @param request
+	 *            The incoming {@link BaseHttpRequest}.
+	 * 
+	 * @return Returns a {@link BaseHttpResponse} with contents containing the results of method call on the service
+	 *         implementation of {@link DemoApi}.
+	 */
 	@Override
 	public BaseHttpResponse invoke(BaseHttpRequest request) {
 

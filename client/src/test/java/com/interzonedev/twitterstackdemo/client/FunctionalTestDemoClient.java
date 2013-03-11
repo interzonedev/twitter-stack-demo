@@ -6,11 +6,18 @@ import javax.inject.Named;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.interzonedev.twitterstackdemo.common.DemoApi;
+
+/**
+ * Functional tests on the client implementation of {@link DemoApi}.
+ * 
+ * @author interzone
+ */
 public class FunctionalTestDemoClient extends AbstractTest {
 
 	@Inject
 	@Named("demoClient")
-	private DemoClient demoClient;
+	private DemoApi demoClient;
 
 	@Test
 	public void testDoSomething() throws Exception {

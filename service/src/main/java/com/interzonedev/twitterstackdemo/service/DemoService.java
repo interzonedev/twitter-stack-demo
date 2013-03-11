@@ -11,7 +11,16 @@ import ch.qos.logback.classic.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
+import com.interzonedev.twitterstackdemo.service.transport.DemoInvoker;
+import com.interzonedev.twitterstackdemo.service.transport.DemoReceiver;
 
+/**
+ * Service implementation of {@link DemoApi}. Performs the business logic whether called directly or via a remote
+ * procedure call. Meant to be injected into {@link DemoInvoker} and {@link DemoReceiver}.
+ * 
+ * @author interzone
+ * 
+ */
 @Named("demoService")
 public class DemoService implements DemoApi {
 
@@ -19,6 +28,11 @@ public class DemoService implements DemoApi {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.interzonedev.twitterstackdemo.common.DemoApi#doSomething(java.lang.String, long)
+	 */
 	@Override
 	public String doSomething(String message, long delayMillis) throws Exception {
 
@@ -39,6 +53,11 @@ public class DemoService implements DemoApi {
 		return responseContent;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.interzonedev.twitterstackdemo.common.DemoApi#doAnotherThing(java.lang.String)
+	 */
 	@Override
 	public void doAnotherThing(String message) throws Exception {
 

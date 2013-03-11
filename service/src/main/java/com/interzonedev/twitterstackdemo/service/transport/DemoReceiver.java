@@ -15,6 +15,12 @@ import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
 
+/**
+ * Implementation of {@link Receiver<BaseHttpRequest, BaseHttpResponse>} specific to the service implementation of
+ * {@link DemoApi}.
+ * 
+ * @author interzone
+ */
 @Named("demoReceiver")
 public class DemoReceiver implements Receiver<BaseHttpRequest, BaseHttpResponse> {
 
@@ -24,6 +30,16 @@ public class DemoReceiver implements Receiver<BaseHttpRequest, BaseHttpResponse>
 	@Named("demoService")
 	private DemoApi demoService;
 
+	/**
+	 * Determines which method to call on the service implementation of {@link DemoApi} based on the properties of the
+	 * incomong {@link BaseHttpRequest}.
+	 * 
+	 * @param request
+	 *            The incoming {@link BaseHttpRequest}.
+	 * 
+	 * @return Returns a {@link BaseHttpResponse} with no content and a 204 status after the method call on the service
+	 *         implementation of {@link DemoApi}.
+	 */
 	@Override
 	public BaseHttpResponse receive(BaseHttpRequest request) {
 
