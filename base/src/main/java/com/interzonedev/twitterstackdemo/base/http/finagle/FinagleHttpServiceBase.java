@@ -96,14 +96,30 @@ public class FinagleHttpServiceBase extends AbstractFinagleHttpBase implements
 	 * Starts the service.
 	 */
 	@Override
-	public void launch() {
+	public void init() {
 
-		log.info("launch: Starting service \"" + serviceName + "\" at http://" + serviceHostName + ":" + servicePort);
+		log.info("init: Starting service \"" + serviceName + "\" at http://" + serviceHostName + ":" + servicePort);
 
 		ServerBuilder.safeBuild(
 				httpService,
 				ServerBuilder.get().codec(Http.get()).name(serviceName)
 						.bindTo(new InetSocketAddress(serviceHostName, servicePort)));
+
+	}
+
+	/**
+	 * Closes the service.
+	 */
+	@Override
+	public void destroy() {
+
+		log.info("destroy: Closing service \"" + serviceName + "\" at http://" + serviceHostName + ":" + servicePort);
+
+		try {
+			httpService.close();
+		} catch (Throwable t) {
+			log.error("destroy: Error closing service", t);
+		}
 
 	}
 

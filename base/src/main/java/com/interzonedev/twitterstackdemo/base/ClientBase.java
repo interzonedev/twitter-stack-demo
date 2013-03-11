@@ -20,6 +20,11 @@ public interface ClientBase<Req, Resp> {
 	public void init();
 
 	/**
+	 * Performs any necessary cleanup such as closing the client.
+	 */
+	public void destroy();
+
+	/**
 	 * Makes a full round trip remote procedure call with content in the response.
 	 * 
 	 * @param request

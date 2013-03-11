@@ -12,7 +12,7 @@
 	<context:component-scan base-package="com.interzonedev.twitterstackdemo.service" />
 
 	<bean id="httpServiceBase" class="com.interzonedev.twitterstackdemo.base.http.finagle.FinagleHttpServiceBase"
-		init-method="launch">
+		init-method="init" destroy-method="destroy">
 		<constructor-arg index="0" value="${http.service.serverName}" />
 		<constructor-arg index="1" value="${http.service.hostName}" />
 		<constructor-arg index="2" value="${http.service.port}" />

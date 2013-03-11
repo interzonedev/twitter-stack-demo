@@ -53,6 +53,23 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 	}
 
 	/**
+	 * Closes the client.
+	 */
+	@Override
+	public void destroy() {
+
+		log.info("destroy: Closing client for http://" + serviceHostName + ":" + servicePort
+				+ " with connection limit " + hostConnectionLimit);
+
+		try {
+			httpClient.close();
+		} catch (Throwable t) {
+			log.error("destroy: Error closing client", t);
+		}
+
+	}
+
+	/**
 	 * Twitter Finagle specific implementation of {@link ClientBase#call(Object)}.
 	 */
 	@Override

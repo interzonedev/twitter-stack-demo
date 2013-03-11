@@ -41,4 +41,5 @@ public class FunctionalTestDemoClient extends AbstractTest {
 		demoClient.doAnotherThing("Foo");
 
 	}
+
 }

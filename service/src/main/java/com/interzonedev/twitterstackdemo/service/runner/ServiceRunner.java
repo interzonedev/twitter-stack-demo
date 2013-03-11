@@ -24,7 +24,19 @@ public class ServiceRunner {
 
 		log.info("Loading service application context");
 
-		new ClassPathXmlApplicationContext("/com/interzonedev/twitterstackdemo/service/applicationContext.xml");
+		final ClassPathXmlApplicationContext appCtx = new ClassPathXmlApplicationContext(
+				"/com/interzonedev/twitterstackdemo/service/applicationContext.xml");
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+
+				log.info("Closing service application context");
+
+				appCtx.close();
+			}
+
+		});
 
 	}
 

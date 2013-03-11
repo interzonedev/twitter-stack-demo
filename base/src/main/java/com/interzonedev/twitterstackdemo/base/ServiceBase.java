@@ -13,8 +13,13 @@ package com.interzonedev.twitterstackdemo.base;
 public interface ServiceBase<Req, Resp> {
 
 	/**
-	 * Starts the service.
+	 * Performs any necessary intialization such as creating and starting the service.
 	 */
-	public void launch();
+	public void init();
+
+	/**
+	 * Performs any necessary cleanup such as closing the service.
+	 */
+	public void destroy();
 
 }
