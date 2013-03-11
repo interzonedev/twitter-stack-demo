@@ -36,7 +36,7 @@ public class DemoClient implements DemoApi {
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
 	@Inject
-	@Named("httpClientBase")
+	@Named("demoHttpClientBase")
 	private ClientBase<BaseHttpRequest, BaseHttpResponse> httpClientBase;
 
 	/*
