@@ -19,30 +19,22 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.Logger;
-
+import com.interzonedev.twitterstackdemo.base.http.AbstractHttpBase;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 
 /**
- * Abstract super class for all client and service implementations using HTTP as the transport mechanism. Contains
- * helper methods common to both the client and the service.
- * 
- * Uses <a href="http://twitter.github.com/finagle" target="_blank">Twitter Finagle</a> as an implementation of the
- * HTTP transport layer.
+ * Abstract super class for all HTTP client and service implementations using <a
+ * href="http://twitter.github.com/finagle" target="_blank">Twitter Finagle</a> as the implementation for the transport
+ * mechanism. Contains helper methods common to both the Finagle client and the service.
  * 
  * @author mmarkarian
  */
-public abstract class AbstractFinagleHttpBase {
-
-	public static final String SEND_REQUEST_HEADER_NAME = "base-send-request";
+public abstract class AbstractFinagleHttpBase extends AbstractHttpBase {
 
 	private static final HttpVersion HTTP_VERSION = HttpVersion.HTTP_1_1;
-
-	protected final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
 	protected boolean isSendRequest(BaseHttpRequest baseRequest) {
 

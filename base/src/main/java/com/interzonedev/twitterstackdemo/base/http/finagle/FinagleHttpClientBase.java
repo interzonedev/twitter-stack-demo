@@ -1,13 +1,10 @@
 package com.interzonedev.twitterstackdemo.base.http.finagle;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.interzonedev.twitterstackdemo.base.ClientBase;
+import com.interzonedev.twitterstackdemo.base.concurrent.BaseFutureAdaptor;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.twitter.finagle.Service;
@@ -73,7 +70,7 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 	 * Twitter Finagle specific implementation of {@link ClientBase#call(Object)}.
 	 */
 	@Override
-	public Future<BaseHttpResponse> call(final BaseHttpRequest baseRequest) {
+	public BaseFutureAdaptor<BaseHttpResponse> call(final BaseHttpRequest baseRequest) {
 
 		log.debug("call: Sending for call - baseRequest - " + baseRequest);
 
@@ -81,6 +78,7 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 
 		Future<HttpResponse> responseFuture = httpClient.apply(request);
 
+		// Change the payload from a Finagle response to a base response.
 		Future<BaseHttpResponse> baseResponseFuture = responseFuture
 				.transformedBy(new FutureTransformer<HttpResponse, BaseHttpResponse>() {
 					@Override
@@ -93,7 +91,7 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 
 		log.debug("call: Sent request");
 
-		return baseResponseFuture;
+		return new FinagleFutureAdaptor(baseResponseFuture);
 
 	}
 
@@ -102,21 +100,17 @@ public class FinagleHttpClientBase extends AbstractFinagleHttpBase implements
 	 * {@link AbstractFinagleHttpBase#SEND_REQUEST_HEADER_NAME} header to the request to mark it as a send request.
 	 */
 	@Override
-	public Future<BaseHttpResponse> send(BaseHttpRequest baseRequest) {
+	public BaseFutureAdaptor<BaseHttpResponse> send(BaseHttpRequest baseRequest) {
 
 		log.debug("send: Sending for send - baseRequest - " + baseRequest);
 
-		Map<String, List<String>> headers = new HashMap<String, List<String>>(baseRequest.getHeaders());
-		headers.put(SEND_REQUEST_HEADER_NAME, null);
+		BaseHttpRequest sendRequest = addSendHeaderToRequest(baseRequest);
 
-		BaseHttpRequest sendRequest = new BaseHttpRequest(baseRequest.getId(), headers, baseRequest.getContent(),
-				baseRequest.getUrl(), baseRequest.getMethod(), baseRequest.getParameters());
-
-		Future<BaseHttpResponse> baseResponseFuture = call(sendRequest);
+		BaseFutureAdaptor<BaseHttpResponse> futureAdaptor = call(sendRequest);
 
 		log.debug("send: Sent request");
 
-		return baseResponseFuture;
+		return futureAdaptor;
 
 	}
 

@@ -34,6 +34,7 @@ public class ServiceRunner {
 				log.info("Closing service application context");
 
 				appCtx.close();
+
 			}
 
 		});

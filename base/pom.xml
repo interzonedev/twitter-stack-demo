@@ -33,11 +33,16 @@
 			<artifactId>finagle-core</artifactId>
 			<version>6.1.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.twitter</groupId>
 			<artifactId>finagle-http</artifactId>
 			<version>6.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ning</groupId>
+			<artifactId>async-http-client</artifactId>
+			<version>1.7.10</version>
 		</dependency>
 	</dependencies>
 

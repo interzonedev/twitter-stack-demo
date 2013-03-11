@@ -15,14 +15,11 @@ import scala.actors.threadpool.Arrays;
 import ch.qos.logback.classic.Logger;
 
 import com.interzonedev.twitterstackdemo.base.ClientBase;
+import com.interzonedev.twitterstackdemo.base.concurrent.BaseFutureAdaptor;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpMethod;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpRequest;
 import com.interzonedev.twitterstackdemo.base.http.BaseHttpResponse;
 import com.interzonedev.twitterstackdemo.common.DemoApi;
-import com.twitter.util.Duration;
-import com.twitter.util.Future;
-import com.twitter.util.Throw;
-import com.twitter.util.Try;
 
 /**
  * Client implementation of {@link DemoApi}. Creats the necessary instance of {@link BaseHttpRequest} to make the remote
@@ -36,7 +33,7 @@ public class DemoClient implements DemoApi {
 	private final Logger log = (Logger) LoggerFactory.getLogger(getClass());
 
 	@Inject
-	@Named("demoHttpClientBase")
+	@Named("ningDemoHttpClientBase")
 	private ClientBase<BaseHttpRequest, BaseHttpResponse> httpClientBase;
 
 	/*
@@ -62,28 +59,26 @@ public class DemoClient implements DemoApi {
 
 		log.debug("doSomething: Sending request");
 
-		Future<BaseHttpResponse> responseFuture = httpClientBase.call(baseRequest);
+		BaseFutureAdaptor<BaseHttpResponse> futureAdaptor = httpClientBase.call(baseRequest);
 
 		log.debug("doSomething: Sent request");
 
 		log.debug("doSomething: Blocking the thread to get the response");
 
 		long timeoutMillis = 1000L;
-		Try<BaseHttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS
-				.toNanos(timeoutMillis)));
-
-		log.debug("doSomething: Got response");
 
 		String responseContent = null;
 
-		if (responseTry.isReturn()) {
-			BaseHttpResponse response = responseTry.get();
+		try {
+			BaseHttpResponse response = futureAdaptor.get(timeoutMillis, TimeUnit.MILLISECONDS);
+
+			log.debug("doSomething: Got response");
+
 			byte[] responseContentBytes = response.getContent();
 			if (null != responseContentBytes) {
 				responseContent = new String(responseContentBytes);
 			}
-		} else {
-			Throwable t = ((Throw<BaseHttpResponse>) responseTry).e();
+		} catch (Throwable t) {
 			log.error("doSomething: Error getting response", t);
 			throw new Exception(t);
 		}
@@ -114,32 +109,27 @@ public class DemoClient implements DemoApi {
 		BaseHttpRequest baseRequest = new BaseHttpRequest(UUID.randomUUID().toString(), null, null, url, method,
 				parameters);
 
-		log.debug("doSomething: Sending request");
+		log.debug("doAnotherThing: Sending request");
 
-		Future<BaseHttpResponse> responseFuture = httpClientBase.send(baseRequest);
+		BaseFutureAdaptor<BaseHttpResponse> futureAdaptor = httpClientBase.send(baseRequest);
 
-		log.debug("doSomething: Sent request");
+		log.debug("doAnotherThing: Sent request");
 
-		log.debug("doSomething: Blocking the thread to get the response");
-
-		long timeoutMillis = 1000L;
-		Try<BaseHttpResponse> responseTry = responseFuture.get(new Duration(TimeUnit.MILLISECONDS
-				.toNanos(timeoutMillis)));
-
-		log.debug("doSomething: Got response");
+		log.debug("doAnotherThing: Blocking the thread to get the response");
 
 		int responseStatus = 500;
 
-		if (responseTry.isReturn()) {
-			BaseHttpResponse response = responseTry.get();
+		long timeoutMillis = 1000L;
+		try {
+			BaseHttpResponse response = futureAdaptor.get(timeoutMillis, TimeUnit.MILLISECONDS);
+			log.debug("doAnotherThing: Got response");
 			responseStatus = response.getStatus();
-		} else {
-			Throwable t = ((Throw<BaseHttpResponse>) responseTry).e();
-			log.error("doSomething: Error getting response", t);
+		} catch (Throwable t) {
+			log.error("doAnotherThing: Error getting response", t);
 			throw new Exception(t);
 		}
 
-		log.debug("doSomething: responseStatus = " + responseStatus);
+		log.debug("doAnotherThing: responseStatus = " + responseStatus);
 
 	}
 
